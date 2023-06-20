@@ -41,16 +41,23 @@ To store global CSS files. Next.js project also has component-level CSS in each 
 3. or to add global styles.
 4. You need to restart the development server when you add `pages/_app.js`.
 
-# Features
+# Build-in Component
+## Link
+To link to anther page by clicking.  
 
-## [CSS Modules](https://nextjs.org/docs/pages/building-your-application/styling/css-modules)
+Go to `pages/index.js` to check the code.
+
+# CSS Modules
+
+The [official documentation is here](https://nextjs.org/docs/pages/building-your-application/styling/css-modules).
+
 1. CSS Modules are extracted from the JavaScript bundles at build time and generate .css files that are loaded automatically by Next.js.
 2. CSS module allows you to scope CSS at the component-level, you can create a `.css` file in each component folder to make the whole structure organized.
    1. Go to `components/layout.js` to see how to use CSS in a component level.
 3. A unique class name will be generated automatically for avoiding a class name collisions.
 4. Next.js’s code splitting feature works on CSS Modules as well. It ensures the minimal amount of CSS is loaded for each page.
 
-## Pre-rendering
+# Pre-rendering
 By default, Next.js pre-renders every page. This means that Next.js generates HTML with minimal JavaScript code for each page in advance, instead of having it all done. Only When a page is loaded by the browser, its JavaScript code runs and makes the page fully interactive. (This process is called **hydration**.)
 
 <img src="public/images/prerendering.png" width=300 height=200></img>
@@ -62,7 +69,7 @@ We can check the pre-rendering by disabling JavaScript in the browser. You will 
 
 The are two forms for pre-rendering: static generation and Server-side rendering.
 
-### Static Generation
+## Static Generation
 Static Generation is the pre-rendering method that generates the HTML at build time. The pre-rendered HTML is then reused on each request.
 <img src="public/images/static-generation.png" width=300 height=150></img>
 
@@ -70,24 +77,68 @@ In development mode (when you run `npm run dev` or `yarn dev`), pages are pre-re
 
 We recommend using Static Generation (with and without data) whenever possible because your page can be built once and served by CDN
 
-### Server-side
+## Server-side
 Server-side Rendering is the pre-rendering method that generates the HTML on each request.
 <img src="public/images/server-side-prerendering.png" width=300 height=180></img>
 
-## [Fetch data](https://nextjs.org/docs/pages/building-your-application/data-fetching)
+# Routes
 
-### `getStaticProps()`
-It is used in a Static Generation form. The function is executed at build time ahead of a user's request. Return the data in props and the data can be used as a prop. Go to `pages/index.js` to see how to use. 
+## Dynamic Routes
+Since the pages folder determines the routes, if we want to have the path `/posts/<id>`, we need to utilize dynamic routes. Hence, we must create a `pages/posts/[id].js` file. Pages that begin with `[` and end with `]` signify dynamic routes in Next.js.
+
+There components must be contained in the dynamic routes:
+1. `getStaticPaths` to list all possible values for `id`.
+2. `getStaticProps` to take `id` and fetch necessary data based on `id` and return the value wrapped in the `props`.
+3. A React component to get the values from `props` and render them.
+
+To list all possible values for `id`, we need to use the `getStaticPaths` function in the file `pages/posts/[id].js`. The return value must be in this format:
+```javascript
+return {
+    paths: [ // must contain paths
+        { // object's array
+            params: { // must contain params key
+                // Values in the params can be customized
+                id: 'what-you-want',
+            },
+        },
+        {
+            params: { // must contain params key
+                id: 'whatever',
+            }
+        }
+    ],
+    fallback: true
+}
+```
+
+Additionally, the filename `id` (a.k.a path variable) will be passed to the `getStaticProps` function. Therefore, you can access the value of `id` within the `getStaticProps` function. Wrap `postData` into `props` and return it.
+
+The component `Post` could take `postData` and render it.
+
+Refer to `pages/posts/[id].js` to review the code.
+
+
+# Fetch data
+
+The [official document is here](https://nextjs.org/docs/pages/building-your-application/data-fetching).
+
+**`getStaticProps()`**
+
+It is used in a Static Generation form. The function is executed at build time ahead of a user's request. Return the data in props and the data can be used as a prop. Go to `pages/index.js` to see how to use.  
 
 Since `getStaticProps()` executes entirely on the server-side, it doesn't send any JavaScript code to the browser. Instead, it prepares the data, renders it, and then sends the resulting HTML to the browser. This unique behavior allows you to write code directly within `getStaticProps()`, such as database queries, without worrying about exposing sensitive logic or data to the client-side.
+   
+In development (`npm run dev` or `yarn dev`), `getStaticProps` runs on every request.
+   
+In production, `getStaticProps` runs at build time. However, this behavior can be enhanced using the fallback key returned by `getStaticPaths`
 
-1. In development (`npm run dev` or `yarn dev`), `getStaticProps` runs on every request.
-2. In production, `getStaticProps` runs at build time. However, this behavior can be enhanced using the fallback key returned by `getStaticPaths`
+**`getStaticPaths()`**
 
-### `getServerSideProps()`
+
+**`getServerSideProps()`**
 It provides a server-side rendering.
 
-### `useSWR`
+**`useSWR`**
 To fetch data on client side.
 
 
@@ -95,7 +146,8 @@ To fetch data on client side.
 # Libraries / Dependencies
 
 ## In this project
-1. gray-matter: convert markdown files into `.json` format.
+1. `gray-matter`: convert markdown files into `.json` format.
+2. `remark` & `remark-html`: render Markdown.
 
 
 ## More Libraries
