@@ -10,6 +10,7 @@ Due to the pre-rendering process in Next.js, deploying a Next.js project to S3 a
 # Structure of the whole projects
 
 The structure of the next.js project:
+```text
 <root>
   |
   |--- components
@@ -21,6 +22,13 @@ The structure of the next.js project:
   |--- pages
          |
          |--- _app.js
+         |
+         |--- index.js
+         |
+         |--- posts
+                |
+                |--- [id].js
+```
 
 ## `components` folder
 Keep components here.
