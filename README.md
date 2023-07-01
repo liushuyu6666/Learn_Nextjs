@@ -107,7 +107,8 @@ The [official documentation is here](https://nextjs.org/docs/pages/building-your
 3. A unique class name will be generated automatically for avoiding a class name collisions.
 4. Next.js’s code splitting feature works on CSS Modules as well. It ensures the minimal amount of CSS is loaded for each page.
 
-# Routes
+# Page Routes
+There are two kinds of Routes in the Next.js. one is 
 
 ## Dynamic Routes
 Since the pages folder determines the routes, if we want to have the path `/posts/<id>`, we need to utilize dynamic routes. Hence, we must create a `pages/posts/[id].js` file. Pages that begin with `[` and end with `]` signify dynamic routes in Next.js.
@@ -142,6 +143,11 @@ Additionally, the filename `id` (a.k.a path variable) will be passed to the `get
 The component `Post` could take `postData` and render it.
 
 Refer to `pages/posts/[id].js` to review the code.
+
+# API Routes
+API routes in Next.js are not counted as part of the regular page routes. API routes are a separate concept that allows you to create serverless API endpoints within your Next.js application.
+
+Define API Routes under the folder `pages/api`.
 
 
 # Fetch data
