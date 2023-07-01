@@ -1,4 +1,5 @@
 # Overview
+There are two types of Next.js, one is **Pages Router** and another is **App Router**,  
 In Next.js, there are two main components: the server and the client. To understand how Next.js works, let's consider some key concepts. Web pages consist of HTML, CSS, and JavaScript. HTML can be seen as the structural foundation of the project, while JavaScript dynamically generates additional HTML snippets to enhance the original HTML skeleton based on user actions or other events. HTML and CSS are relatively straightforward for the browser to execute, while JavaScript may require more processing time.
 
 The server-client model in Next.js operates on the principle of minimizing JavaScript execution on the client side. The **server** strives to convert as much JavaScript code, along with fetched data, into pre-rendered HTML code. This pre-rendered HTML is then sent to the browser, eliminating the need for the browser to perform additional rendering. This approach optimizes performance and reduces the burden on the client.
@@ -6,6 +7,47 @@ The server-client model in Next.js operates on the principle of minimizing JavaS
 On the other hand, the **client-side** code in Next.js is responsible for sending JavaScript code to the browser. This JavaScript code enables the rendering of interactive components, which can respond to user interactions and events.
 
 Due to the pre-rendering process in Next.js, deploying a Next.js project to S3 as a pure React.js project is not feasible. However, this does not imply that we must deploy the server and client components separately. Instead, we have alternative options such as deploying the entire project on AWS Elastic Beanstalk or Vercel, both of which can effectively handle the combined server and client components.
+
+To clarify all of the concepts, let's take a look at **Pre-rendering** and **Life cycle** sections.
+
+# Pre-rendering
+By default, Next.js pre-renders every page. This means that Next.js generates HTML with minimal JavaScript code for each page in advance, instead of having it all done. Only When a page is loaded by the browser, its JavaScript code runs and makes the page fully interactive. (This process is called **hydration**.)
+
+<img src="public/images/prerendering.png" width=300 height=200></img>
+<img src="public/images/no-prerendering.png" width=300 height=150></img>
+
+Pre-rendering can result in better performance and SEO.  
+
+We can check the pre-rendering by disabling JavaScript in the browser. You will see the Next.js app is still rendered without JavaScript, but [This pure React.js page](https://create-react-template.vercel.app/) cannot be displayed.
+
+The are two forms for pre-rendering: Static generation and Server-side rendering.
+
+## Static Generation (build time only)
+Static Generation is the pre-rendering method that generates the HTML at build time. The pre-rendered HTML is then reused on each request.
+<img src="public/images/static-generation.png" width=300 height=150></img>
+
+In development mode (when you run `npm run dev` or `yarn dev`), pages are pre-rendered on every request. This also applies to Static Generation to make it easier to develop. When going to production, Static Generation will happen once, at build time, and not on every request.
+
+We recommend using Static Generation (with and without data) whenever possible because your page can be built once and served by CDN
+
+## Server-side (for each request)
+Server-side Rendering is the pre-rendering method that generates the HTML on each request.
+<img src="public/images/server-side-prerendering.png" width=300 height=180></img>
+
+# Life cycle
+During the build time in Next.js, the following processes occur:
+
+Client-side code execution: The client-side code is bundled, optimized, and prepared for execution in the browser. This includes any JavaScript code responsible for handling client-side interactivity or dynamic updates.
+
+Static pre-rendering: Next.js identifies the pages that can be statically pre-rendered based on the configuration and code in the project. These pages are generated as HTML files during the build process. The generated HTML files will contain the pre-rendered content, including any dynamic data that was available during the build.
+
+Once the build process is complete, the static HTML files are ready to be served to the client.
+
+Now, during each request from the client:
+
+Server-side rendering (SSR): If a requested page cannot be statically pre-rendered (or if dynamic content is required), Next.js falls back to server-side rendering (SSR). In SSR, the server processes the request, generates the HTML content on-demand, and sends it to the client. This allows for dynamic data to be fetched and rendered on each request, ensuring the most up-to-date content is delivered.
+To summarize, during the build time, Next.js performs client-side code execution first, followed by static pre-rendering to generate pre-rendered HTML files. Then, during each request, if needed, the server-side rendering (SSR) process takes place to generate dynamic HTML content on-demand.
+
 
 # Structure of the whole projects
 
@@ -64,30 +106,6 @@ The [official documentation is here](https://nextjs.org/docs/pages/building-your
    1. Go to `components/layout.js` to see how to use CSS in a component level.
 3. A unique class name will be generated automatically for avoiding a class name collisions.
 4. Next.js’s code splitting feature works on CSS Modules as well. It ensures the minimal amount of CSS is loaded for each page.
-
-# Pre-rendering
-By default, Next.js pre-renders every page. This means that Next.js generates HTML with minimal JavaScript code for each page in advance, instead of having it all done. Only When a page is loaded by the browser, its JavaScript code runs and makes the page fully interactive. (This process is called **hydration**.)
-
-<img src="public/images/prerendering.png" width=300 height=200></img>
-<img src="public/images/no-prerendering.png" width=300 height=150></img>
-
-Pre-rendering can result in better performance and SEO.  
-
-We can check the pre-rendering by disabling JavaScript in the browser. You will see the Next.js app is still rendered without JavaScript, but [This pure React.js page](https://create-react-template.vercel.app/) cannot be displayed.
-
-The are two forms for pre-rendering: static generation and Server-side rendering.
-
-## Static Generation
-Static Generation is the pre-rendering method that generates the HTML at build time. The pre-rendered HTML is then reused on each request.
-<img src="public/images/static-generation.png" width=300 height=150></img>
-
-In development mode (when you run `npm run dev` or `yarn dev`), pages are pre-rendered on every request. This also applies to Static Generation to make it easier to develop. When going to production, Static Generation will happen once, at build time, and not on every request.
-
-We recommend using Static Generation (with and without data) whenever possible because your page can be built once and served by CDN
-
-## Server-side
-Server-side Rendering is the pre-rendering method that generates the HTML on each request.
-<img src="public/images/server-side-prerendering.png" width=300 height=180></img>
 
 # Routes
 
