@@ -1,3 +1,25 @@
+- [Overview](#overview)
+- [Pre-rendering](#pre-rendering)
+  - [Hydration](#hydration)
+  - [Pre-rendering Types](#pre-rendering-types)
+- [Data Fetch](#data-fetch)
+- [Structure of the whole projects](#structure-of-the-whole-projects)
+  - [`components` folder](#components-folder)
+  - [`public` folder](#public-folder)
+  - [`styles` folder](#styles-folder)
+  - [`pages` folder](#pages-folder)
+    - [`_app.js`](#_appjs)
+- [Build-in Component](#build-in-component)
+  - [Link](#link)
+- [CSS Modules](#css-modules)
+- [Page Routes](#page-routes)
+  - [Dynamic Routes](#dynamic-routes)
+- [API Routes](#api-routes)
+- [Libraries / Dependencies](#libraries--dependencies)
+  - [In this project](#in-this-project)
+  - [More Libraries](#more-libraries)
+
+
 # Overview
 To truly grasp the essence of Next.js, one must first understand the interplay between HTML and JavaScript in the web's architecture. Web pages consist of HTML, CSS, and JavaScript. HTML can be seen as the structural foundation of the project, while JavaScript dynamically generates additional HTML snippets to enhance the original HTML skeleton based on user actions or other events. Furthermore, it's crucial to comprehend [the rendering process](https://github.com/liushuyu6666/Knowledge/blob/master/Web_Application/Readme.md#rendering).
 
