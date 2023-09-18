@@ -4,8 +4,8 @@ To truly grasp the essence of Next.js, one must first understand the interplay b
 `Next.js` is closely integrated with `React.js`. Upon the initial page load, `Next.js` pre-renders the content, delivering a complete HTML page accompanied by a JavaScript bundle (which includes the `React.js` code). As for subsequent interactions or requests, it's `React.js` that steps in. React fetches the necessary data, making necessary updates to the web page on the fly. Thus, the `Next.js` application still consists of multiple React.js components. The key distinction is that, unlike standalone `React.js` applications, the initial data fetching isn't initiated by the `useEffect()` function. However, once fetched, this data might still be managed using React's state mechanisms."
 
 `Next.js` can be better understood when contrasted with the mechanisms of `React.js`:
-<img src="public/images/nextjs.png" width=300 height=200></img>
-<img src="public/images/reactjs.png" width=300 height=400></img>
+<img src="public/images/nextjs.png" width=500 height=500></img>
+<img src="public/images/reactjs.png" width=500 height=800></img>
 
 # Pre-rendering
 An integral feature of `Next.js` is "Pre-rendering". Upon an initial browser request to a `Next.js` server, the framework pre-renders the content by fetching necessary data from relevant sources. This server then compiles this data with HTML and requisite JavaScript (including React.js code for subsequent interactions) to produce the pre-rendered page. Consequently, the browser receives a full HTML page complemented by a minimal set of JavaScript, enabling it to immediately display the content without waiting for initial data responses.
