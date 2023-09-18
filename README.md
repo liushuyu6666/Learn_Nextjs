@@ -1,52 +1,56 @@
 # Overview
-There are two types of Next.js, one is **Pages Router** and another is **App Router**,  
-In Next.js, there are two main components: the server and the client. To understand how Next.js works, let's consider some key concepts. Web pages consist of HTML, CSS, and JavaScript. HTML can be seen as the structural foundation of the project, while JavaScript dynamically generates additional HTML snippets to enhance the original HTML skeleton based on user actions or other events. HTML and CSS are relatively straightforward for the browser to execute, while JavaScript may require more processing time.
+To truly grasp the essence of Next.js, one must first understand the interplay between HTML and JavaScript in the web's architecture. Web pages consist of HTML, CSS, and JavaScript. HTML can be seen as the structural foundation of the project, while JavaScript dynamically generates additional HTML snippets to enhance the original HTML skeleton based on user actions or other events. Furthermore, it's crucial to comprehend [the rendering process](https://github.com/liushuyu6666/Knowledge/blob/master/Web_Application/Readme.md#rendering).
 
-The server-client model in Next.js operates on the principle of minimizing JavaScript execution on the client side. The **server** strives to convert as much JavaScript code, along with fetched data, into pre-rendered HTML code. This pre-rendered HTML is then sent to the browser, eliminating the need for the browser to perform additional rendering. This approach optimizes performance and reduces the burden on the client.
+`Next.js` is closely integrated with `React.js`. Upon the initial page load, `Next.js` pre-renders the content, delivering a complete HTML page accompanied by a JavaScript bundle (which includes the `React.js` code). As for subsequent interactions or requests, it's `React.js` that steps in. React fetches the necessary data, making necessary updates to the web page on the fly. Thus, the `Next.js` application still consists of multiple React.js components. The key distinction is that, unlike standalone `React.js` applications, the initial data fetching isn't initiated by the `useEffect()` function. However, once fetched, this data might still be managed using React's state mechanisms."
 
-On the other hand, the **client-side** code in Next.js is responsible for sending JavaScript code to the browser. This JavaScript code enables the rendering of interactive components, which can respond to user interactions and events.
-
-Due to the pre-rendering process in Next.js, deploying a Next.js project to S3 as a pure React.js project is not feasible. However, this does not imply that we must deploy the server and client components separately. Instead, we have alternative options such as deploying the entire project on AWS Elastic Beanstalk or Vercel, both of which can effectively handle the combined server and client components.
-
-To clarify all of the concepts, let's take a look at **Pre-rendering** and **Life cycle** sections.
+`Next.js` can be better understood when contrasted with the mechanisms of `React.js`:
+<img src="public/images/nextjs.png" width=300 height=200></img>
+<img src="public/images/reactjs.png" width=300 height=400></img>
 
 # Pre-rendering
-By default, Next.js pre-renders every page. This means that Next.js generates HTML with minimal JavaScript code for each page in advance, instead of having it all done. Only When a page is loaded by the browser, its JavaScript code runs and makes the page fully interactive. (This process is called **hydration**.)
+An integral feature of `Next.js` is "Pre-rendering". Upon an initial browser request to a `Next.js` server, the framework pre-renders the content by fetching necessary data from relevant sources. This server then compiles this data with HTML and requisite JavaScript (including React.js code for subsequent interactions) to produce the pre-rendered page. Consequently, the browser receives a full HTML page complemented by a minimal set of JavaScript, enabling it to immediately display the content without waiting for initial data responses.
 
-<img src="public/images/prerendering.png" width=300 height=200></img>
-<img src="public/images/no-prerendering.png" width=300 height=150></img>
-
-Pre-rendering can result in better performance and SEO.  
+Importantly, along with the HTML, React.js code is transmitted. As the browser processes this code, React initiates a process known as **hydration**. This phase ensures React's virtual DOM aligns with the existing page's real DOM. Upon successful hydration, React assumes control of the page, managing subsequent user interactions, such as button clicks or form submissions.
 
 We can check the pre-rendering by disabling JavaScript in the browser. You will see the Next.js app is still rendered without JavaScript, but [This pure React.js page](https://create-react-template.vercel.app/) cannot be displayed.
 
-The are two forms for pre-rendering: Static generation and Server-side rendering.
+## Hydration
+When the JavaScript code runs in the browser, React "hydrates" the already-rendered content. "Hydration" means that React attaches event listeners and state management to the existing DOM produced by the server-side rendered HTML. Instead of recreating the entire DOM, React uses its virtual DOM to understand the structure and state of the already-present real DOM. Because the structures are the same (since the server used the same React code to generate the HTML), React can attach event listeners without re-rendering the content.
 
-## Static Generation (build time only)
-Static Generation is the pre-rendering method that generates the HTML at build time. The pre-rendered HTML is then reused on each request.
-<img src="public/images/static-generation.png" width=300 height=150></img>
+Once hydration is complete, the app behaves as a typical React SPA. Any updates or state changes trigger React's diffing algorithm against the virtual DOM, and only the necessary real DOM updates occur.
 
-In development mode (when you run `npm run dev` or `yarn dev`), pages are pre-rendered on every request. This also applies to Static Generation to make it easier to develop. When going to production, Static Generation will happen once, at build time, and not on every request.
+## Pre-rendering Types
+Pre-rendering methods includes:
+1. **Server-Side Rendering (SSR)**: 
+   1. Implemented using the `getServerSideProps` method in Next.js.
+   2. The page is pre-rendered for each request, ensuring the most up-to-date content.
+   3. This approach is triggered by:
+      1. initially requesting a page,
+      2. refreshing the page,
+      3. Navigating to a new page (within the same `Next.js` app): This might not always trigger server-side rendering. When you navigate between pages within a `Next.js` application using its `<Link>` component, the navigation occurs client-side, taking advantage of `React.js`'s capabilities to only update the changed parts of the page. This client-side navigation fetches the new page's content (and runs any data-fetching code in the page's components) but doesn't do a full server-side render. However, if you navigate to a new page that is specifically set up to always require SSR, or if you navigate using a full page load (like if you manually change the URL or use a standard anchor tag), then it would trigger SSR.
+2. **Static Generation**:
+   1. Implemented using the `getStaticProps` method in Next.js.
+   2. Pages are pre-rendered at build time, meaning there's no need to fetch new data post-build.
+   3. Once generated, the static page can be cached by a Content Delivery Network (CDN) for faster delivery.
+3. **Incremental Static Regeneration**:
+   1. An optimal blend of the two aforementioned methods.
+   2. Initially, pages are pre-rendered at build time similar to static generation. However, a revalidation interval is set, post which the page is re-rendered.
+   3. Following each re-rendering interval, users are presented with an updated version, which then gets cached until the subsequent interval.
 
-We recommend using Static Generation (with and without data) whenever possible because your page can be built once and served by CDN
+Note: For any individual page in Next.js, you can't employ both static generation and server-side rendering (SSR) concurrently.
 
-## Server-side (for each request)
-Server-side Rendering is the pre-rendering method that generates the HTML on each request.
-<img src="public/images/server-side-prerendering.png" width=300 height=180></img>
+# Data Fetch
+Next.js provides multiple methods for data fetching. We can categorize them into two methods roughly. Pre-rendering methods and Client-side methods.
 
-# Life cycle
-During the build time in Next.js, the following processes occur:
+1. pre-rendering methods: (already introduced)
+   1. Static Generation
+   2. Server-side Rendering
+   3. Incremental Static Regeneration
+2. client-side methods:
+   1. Client-side Data Fetching:
+   2. API Routes:
 
-Client-side code execution: The client-side code is bundled, optimized, and prepared for execution in the browser. This includes any JavaScript code responsible for handling client-side interactivity or dynamic updates.
-
-Static pre-rendering: Next.js identifies the pages that can be statically pre-rendered based on the configuration and code in the project. These pages are generated as HTML files during the build process. The generated HTML files will contain the pre-rendered content, including any dynamic data that was available during the build.
-
-Once the build process is complete, the static HTML files are ready to be served to the client.
-
-Now, during each request from the client:
-
-Server-side rendering (SSR): If a requested page cannot be statically pre-rendered (or if dynamic content is required), Next.js falls back to server-side rendering (SSR). In SSR, the server processes the request, generates the HTML content on-demand, and sends it to the client. This allows for dynamic data to be fetched and rendered on each request, ensuring the most up-to-date content is delivered.
-To summarize, during the build time, Next.js performs client-side code execution first, followed by static pre-rendering to generate pre-rendered HTML files. Then, during each request, if needed, the server-side rendering (SSR) process takes place to generate dynamic HTML content on-demand.
+For client-side data fetching, React sends a request directly from the browser to a separate backend server. Upon receiving the JSON response, the React components update accordingly. API Routes, on the other hand, work similarly but with a key difference: the request is directed to the `Next.js` server itself, rather than an external backend server. Or, in other words, the Next.js server plays the role of a backend server in the API Routes method.
 
 
 # Structure of the whole projects
@@ -148,30 +152,6 @@ Refer to `pages/posts/[id].js` to review the code.
 API routes in Next.js are not counted as part of the regular page routes. API routes are a separate concept that allows you to create serverless API endpoints within your Next.js application.
 
 Define API Routes under the folder `pages/api`.
-
-
-# Fetch data
-
-The [official document is here](https://nextjs.org/docs/pages/building-your-application/data-fetching).
-
-**`getStaticProps()`**
-
-It is used in a Static Generation form. The function is executed at build time ahead of a user's request. Return the data in props and the data can be used as a prop. Go to `pages/index.js` to see how to use.  
-
-Since `getStaticProps()` executes entirely on the server-side, it doesn't send any JavaScript code to the browser. Instead, it prepares the data, renders it, and then sends the resulting HTML to the browser. This unique behavior allows you to write code directly within `getStaticProps()`, such as database queries, without worrying about exposing sensitive logic or data to the client-side.
-   
-In development (`npm run dev` or `yarn dev`), `getStaticProps` runs on every request.
-   
-In production, `getStaticProps` runs at build time. However, this behavior can be enhanced using the fallback key returned by `getStaticPaths`
-
-**`getStaticPaths()`**
-
-
-**`getServerSideProps()`**
-It provides a server-side rendering.
-
-**`useSWR`**
-To fetch data on client side.
 
 
 
